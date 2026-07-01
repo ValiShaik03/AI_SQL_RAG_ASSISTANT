@@ -1,0 +1,120 @@
+import time
+
+from fastapi import APIRouter
+from pydantic import BaseModel
+
+from prompts.sql_prompt import SQL_PROMPT
+from prompts.answer_prompt import ANSWER_PROMPT
+
+from services.llm_service import (
+    generate_sql,
+    generate_answer
+)
+
+from services.sql_service import execute_query
+
+from utils.question_validator import validate_question
+from utils.sql_validator import validate_sql
+
+
+router = APIRouter(
+    prefix="/api",
+    tags=["AI SQL Assistant"]
+)
+
+
+class ChatRequest(BaseModel):
+    question: str
+
+
+@router.post("/chat")
+def chat(request: ChatRequest):
+
+    try:
+
+        start_time = time.perf_counter()
+
+        # ---------------------------------
+        # Validate User Question
+        # ---------------------------------
+
+        is_valid_question, message = validate_question(request.question)
+
+        if not is_valid_question:
+            return {
+                "status": "failed",
+                "question": request.question,
+                "error": message
+            }
+
+        # ---------------------------------
+        # Generate SQL
+        # ---------------------------------
+
+        generated_sql = generate_sql(
+            request.question,
+            SQL_PROMPT
+        )
+
+        # ---------------------------------
+        # Validate SQL
+        # ---------------------------------
+
+        is_valid_sql, message = validate_sql(generated_sql)
+
+        if not is_valid_sql:
+            return {
+                "status": "failed",
+                "question": request.question,
+                "generated_sql": generated_sql,
+                "error": message
+            }
+
+        # ---------------------------------
+        # Execute SQL
+        # ---------------------------------
+
+        columns, data = execute_query(generated_sql)
+
+        # ---------------------------------
+        # Generate AI Answer
+        # ---------------------------------
+
+        answer = generate_answer(
+            request.question,
+            generated_sql,
+            data,
+            ANSWER_PROMPT
+        )
+
+        # ---------------------------------
+        # Execution Time
+        # ---------------------------------
+
+        execution_time = round(
+            (time.perf_counter() - start_time) * 1000,
+            2
+        )
+
+        # ---------------------------------
+        # Response
+        # ---------------------------------
+
+        return {
+            "status": "success",
+            "question": request.question,
+            "generated_sql": generated_sql,
+            "answer": answer,
+            "columns": columns,
+            "rows_returned": len(data),
+            "execution_time_ms": execution_time,
+            "data": data
+        }
+
+    except Exception as e:
+
+        return {
+            "status": "error",
+            "question": request.question,
+            "error": str(e)
+        }
