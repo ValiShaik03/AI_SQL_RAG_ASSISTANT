@@ -1,0 +1,47 @@
+-- ======================================
+-- training_records Seed Data
+-- Generated Automatically
+-- ======================================
+
+INSERT INTO training_records (employee_id, course_name, completion_date, certification)
+VALUES
+(15, 'LangChain', '2026-01-26', 'Completed'),
+(16, 'Deep Learning', '2025-08-11', 'Completed'),
+(4, 'Advanced SQL', '2026-03-23', 'Completed'),
+(17, 'FastAPI', '2025-12-18', 'In Progress'),
+(7, 'FastAPI', '2026-02-10', 'Completed'),
+(16, 'Machine Learning', '2024-02-19', 'Completed'),
+(13, 'AWS Cloud', '2025-05-21', 'Completed'),
+(10, 'Leadership', '2024-06-15', 'Completed'),
+(2, 'Power BI', '2026-08-26', 'Completed'),
+(9, 'LangChain', '2025-10-08', 'Completed'),
+(14, 'Azure Fundamentals', '2026-09-13', 'Completed'),
+(15, 'Machine Learning', '2025-02-02', 'Completed'),
+(13, 'Machine Learning', '2026-09-13', 'Completed'),
+(16, 'Leadership', '2025-05-12', 'Completed'),
+(12, 'Leadership', '2026-04-14', 'Completed'),
+(12, 'Python', '2024-01-27', 'Completed'),
+(5, 'FastAPI', '2026-06-15', 'Completed'),
+(17, 'Machine Learning', '2025-03-15', 'Completed'),
+(9, 'Deep Learning', '2024-01-22', 'Completed'),
+(6, 'Docker', '2026-11-24', 'Completed'),
+(7, 'Power BI', '2025-01-21', 'Completed'),
+(15, 'Kubernetes', '2024-05-08', 'Completed'),
+(4, 'LangChain', '2024-06-18', 'In Progress'),
+(16, 'Deep Learning', '2026-09-16', 'Completed'),
+(9, 'Generative AI', '2024-11-16', 'Completed'),
+(6, 'Docker', '2024-06-25', 'Completed'),
+(12, 'Leadership', '2025-06-07', 'Completed'),
+(15, 'Azure Fundamentals', '2024-03-24', 'Completed'),
+(20, 'Project Management', '2025-03-22', 'Completed'),
+(14, 'Kubernetes', '2026-11-03', 'In Progress'),
+(6, 'Leadership', '2024-04-28', 'Completed'),
+(7, 'Azure Fundamentals', '2026-07-28', 'Completed'),
+(1, 'Kubernetes', '2024-06-19', 'Completed'),
+(6, 'Deep Learning', '2026-12-20', 'Completed'),
+(17, 'LangChain', '2024-10-12', 'In Progress'),
+(7, 'Project Management', '2026-07-07', 'In Progress'),
+(16, 'Azure Fundamentals', '2025-09-07', 'Completed'),
+(6, 'Advanced SQL', '2024-01-14', 'Completed'),
+(3, 'Advanced SQL', '2025-02-07', 'Completed'),
+(6, 'Deep Learning', '2025-03-19', 'In Progress');

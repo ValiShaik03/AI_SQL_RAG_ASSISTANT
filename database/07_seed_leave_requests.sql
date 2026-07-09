@@ -1,0 +1,46 @@
+-- ======================================
+-- leave_requests Seed Data
+-- Generated Automatically
+-- ======================================
+
+INSERT INTO leave_requests (employee_id, leave_type, start_date, end_date, status)
+VALUES
+(13, 'Work From Home', '2026-06-21', '2026-06-22', 'Approved'),
+(14, 'Work From Home', '2026-06-11', '2026-06-16', 'Rejected'),
+(11, 'Casual Leave', '2026-06-02', '2026-06-04', 'Approved'),
+(18, 'Sick Leave', '2026-06-02', '2026-06-07', 'Approved'),
+(13, 'Vacation', '2026-06-05', '2026-06-09', 'Approved'),
+(14, 'Vacation', '2026-06-05', '2026-06-10', 'Pending'),
+(15, 'Work From Home', '2026-06-01', '2026-06-05', 'Rejected'),
+(8, 'Sick Leave', '2026-06-07', '2026-06-09', 'Approved'),
+(20, 'Sick Leave', '2026-06-19', '2026-06-23', 'Approved'),
+(12, 'Casual Leave', '2026-06-17', '2026-06-19', 'Pending'),
+(13, 'Casual Leave', '2026-06-22', '2026-06-24', 'Approved'),
+(11, 'Sick Leave', '2026-06-06', '2026-06-10', 'Approved'),
+(20, 'Sick Leave', '2026-06-12', '2026-06-14', 'Approved'),
+(10, 'Work From Home', '2026-06-20', '2026-06-25', 'Approved'),
+(2, 'Work From Home', '2026-06-08', '2026-06-09', 'Approved'),
+(4, 'Vacation', '2026-06-14', '2026-06-15', 'Pending'),
+(6, 'Sick Leave', '2026-06-05', '2026-06-09', 'Rejected'),
+(17, 'Sick Leave', '2026-06-14', '2026-06-18', 'Approved'),
+(4, 'Vacation', '2026-06-01', '2026-06-05', 'Pending'),
+(4, 'Vacation', '2026-06-22', '2026-06-26', 'Rejected'),
+(10, 'Work From Home', '2026-06-07', '2026-06-11', 'Rejected'),
+(11, 'Work From Home', '2026-06-24', '2026-06-29', 'Pending'),
+(2, 'Casual Leave', '2026-06-14', '2026-06-17', 'Rejected'),
+(4, 'Sick Leave', '2026-06-05', '2026-06-07', 'Rejected'),
+(10, 'Casual Leave', '2026-06-15', '2026-06-17', 'Rejected'),
+(15, 'Casual Leave', '2026-06-10', '2026-06-15', 'Rejected'),
+(5, 'Sick Leave', '2026-06-02', '2026-06-04', 'Approved'),
+(5, 'Casual Leave', '2026-06-04', '2026-06-06', 'Approved'),
+(19, 'Vacation', '2026-06-05', '2026-06-08', 'Approved'),
+(12, 'Vacation', '2026-06-09', '2026-06-10', 'Pending'),
+(2, 'Vacation', '2026-06-12', '2026-06-15', 'Approved'),
+(19, 'Vacation', '2026-06-04', '2026-06-05', 'Approved'),
+(3, 'Sick Leave', '2026-06-07', '2026-06-08', 'Approved'),
+(18, 'Work From Home', '2026-06-16', '2026-06-21', 'Approved'),
+(9, 'Work From Home', '2026-06-11', '2026-06-14', 'Approved'),
+(13, 'Casual Leave', '2026-06-19', '2026-06-24', 'Approved'),
+(4, 'Sick Leave', '2026-06-17', '2026-06-21', 'Approved'),
+(12, 'Sick Leave', '2026-06-21', '2026-06-26', 'Approved'),
+(5, 'Casual Leave', '2026-06-10', '2026-06-15', 'Rejected');

@@ -1,0 +1,48 @@
+-- ======================================
+-- employee_projects Seed Data
+-- Generated Automatically
+-- ======================================
+
+INSERT INTO employee_projects (employee_id, project_id, role)
+VALUES
+(1, 12, 'UI/UX Designer'),
+(1, 8, 'UI/UX Designer'),
+(2, 6, 'Project Manager'),
+(2, 13, 'Project Manager'),
+(3, 15, 'Data Scientist'),
+(3, 8, 'Team Lead'),
+(4, 4, 'Team Lead'),
+(4, 1, 'Database Administrator'),
+(4, 7, 'Full Stack Developer'),
+(5, 3, 'UI/UX Designer'),
+(5, 9, 'Frontend Developer'),
+(6, 10, 'DevOps Engineer'),
+(7, 3, 'Team Lead'),
+(7, 2, 'ML Engineer'),
+(8, 15, 'Project Manager'),
+(9, 2, 'QA Engineer'),
+(9, 13, 'Team Lead'),
+(10, 4, 'Business Analyst'),
+(10, 10, 'Data Scientist'),
+(10, 14, 'Frontend Developer'),
+(11, 6, 'Support Engineer'),
+(11, 15, 'UI/UX Designer'),
+(12, 11, 'Database Administrator'),
+(12, 15, 'QA Engineer'),
+(13, 13, 'Team Lead'),
+(13, 3, 'Project Manager'),
+(13, 10, 'ML Engineer'),
+(14, 15, 'Database Administrator'),
+(14, 12, 'Business Analyst'),
+(14, 14, 'Full Stack Developer'),
+(15, 14, 'UI/UX Designer'),
+(15, 1, 'Team Lead'),
+(16, 15, 'Project Manager'),
+(16, 12, 'Frontend Developer'),
+(17, 9, 'Backend Developer'),
+(18, 9, 'Full Stack Developer'),
+(18, 11, 'UI/UX Designer'),
+(19, 4, 'Project Manager'),
+(19, 15, 'ML Engineer'),
+(19, 14, 'Business Analyst'),
+(20, 3, 'Team Lead');
