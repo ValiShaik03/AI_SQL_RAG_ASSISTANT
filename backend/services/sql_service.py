@@ -1,13 +1,6 @@
-import pymysql
-from utils.config import DB_CONFIG
-
-
-def get_connection():
-    return pymysql.connect(
-        cursorclass=pymysql.cursors.DictCursor,
-        **DB_CONFIG
-    )
-
+from services.db_service import get_connection
+from prompts.sql_prompt import build_sql_prompt
+from services.schema_service import get_database_schema
 
 def execute_query(query):
 

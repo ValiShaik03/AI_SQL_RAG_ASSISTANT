@@ -3,7 +3,8 @@ import time
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from prompts.sql_prompt import SQL_PROMPT
+from prompts.sql_prompt import build_sql_prompt
+from services.schema_service import get_database_schema
 from prompts.answer_prompt import ANSWER_PROMPT
 
 from services.llm_service import (
@@ -51,10 +52,14 @@ def chat(request: ChatRequest):
         # Generate SQL
         # ---------------------------------
 
-        generated_sql = generate_sql(
-            request.question,
-            SQL_PROMPT
+        schema = get_database_schema()
+
+        prompt = build_sql_prompt(
+            schema=schema,
+            question=request.question
         )
+
+        generated_sql = generate_sql(prompt)
 
         # ---------------------------------
         # Validate SQL

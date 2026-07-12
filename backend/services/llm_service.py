@@ -11,21 +11,14 @@ client = Groq(
 MODEL_NAME = "llama-3.3-70b-versatile"
 
 
-def generate_sql(question, prompt):
-
-    final_prompt = f"""
-{prompt}
-
-Question:
-{question}
-"""
+def generate_sql(prompt):
 
     response = client.chat.completions.create(
         model=MODEL_NAME,
         messages=[
             {
                 "role": "user",
-                "content": final_prompt
+                "content": prompt
             }
         ],
         temperature=0
