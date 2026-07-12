@@ -37,12 +37,11 @@ NON_DATABASE_TOPICS = [
     "crypto",
     "stock market",
     "news",
-    "politics",
-    "history",
-    "science",
-    "physics",
-    "chemistry",
-    "mathematics"
+    "politics"
+    # "science",
+    # "physics",
+    # "chemistry",
+    # "mathematics"
 ]
 
 
@@ -86,12 +85,10 @@ def validate_question(question: str):
     # -----------------------------
 
     for topic in NON_DATABASE_TOPICS:
-
         if topic in question_lower:
-
             return (
-                False,
-                "This assistant only answers questions related to the connected employee database."
+            False,
+            "This assistant only answers questions related to the connected employee database."
             )
 
     return True, "OK"

@@ -38,11 +38,9 @@ def chat(request: ChatRequest):
         # ---------------------------------
         # Validate User Question
         # ---------------------------------
-
+        
         is_valid_question, message = validate_question(request.question)
-
-        if not is_valid_question:
-            return {
+        return {
                 "status": "failed",
                 "question": request.question,
                 "error": message

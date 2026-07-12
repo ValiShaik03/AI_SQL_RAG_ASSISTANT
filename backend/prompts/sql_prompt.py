@@ -29,11 +29,44 @@ Relationships:
 
 Rules:
 
-- Generate ONLY SQL.
-- Return exactly one SQL statement.
-- Never generate INSERT, UPDATE, DELETE, DROP, ALTER, CREATE.
-- Use JOIN whenever required.
-- SQL must be valid MySQL.
+Generate optimized MySQL queries.
+
+Never use SELECT * unless the user explicitly requests all columns.
+
+Return only the columns required.
+
+Use JOIN whenever information exists across multiple tables.
+
+Use table aliases.
+
+employees e
+departments d
+attendance a
+projects p
+employee_projects ep
+salary_history sh
+leave_requests lr
+performance_reviews pr
+assets ast
+training_records tr
+
+Use DISTINCT whenever duplicate records may occur.
+
+Use GROUP BY whenever aggregation is required.
+
+Use LOWER() for status comparisons.
+
+Examples:
+
+LOWER(status)='completed'
+
+LOWER(status)='approved'
+
+LOWER(status)='in progress'
+
+If a person's name is mentioned, search using employees.first_name and employees.last_name.
+
+Generate optimized MySQL syntax only.
 
 Question:
 
