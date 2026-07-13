@@ -114,14 +114,13 @@ def chat(request: ChatRequest):
             "execution_time_ms": execution_time,
             "data": data
         }
-
     except Exception as e:
 
-    traceback.print_exc()
+        traceback.print_exc()
 
-    return {
-        "status": "error",
-        "question": request.question,
-        "generated_sql": generated_sql if "generated_sql" in locals() else "",
-        "error": str(e)
-    }
+        return {
+                "status": "error",
+                "question": request.question,
+                "generated_sql": generated_sql if "generated_sql" in locals() else "",
+                "error": str(e)
+            }
