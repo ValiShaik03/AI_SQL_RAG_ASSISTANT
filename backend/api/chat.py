@@ -40,11 +40,12 @@ def chat(request: ChatRequest):
         # ---------------------------------
         
         is_valid_question, message = validate_question(request.question)
-        return {
-                "status": "failed",
-                "question": request.question,
-                "error": message
-            }
+        if not is_valid_question:
+            return {
+        "status": "failed",
+        "question": request.question,
+        "error": message
+    }
 
         # ---------------------------------
         # Generate SQL
