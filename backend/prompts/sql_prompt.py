@@ -202,6 +202,36 @@ Join those CTEs with employees.
 
 Avoid calculating aggregates after multiple joins.
 
+
+=========================================================
+LATEST RECORD RULE
+=========================================================
+
+Whenever the user asks for the latest record
+(latest salary, latest attendance, latest promotion,
+latest asset assignment, latest leave request, etc.)
+
+Always use ROW_NUMBER().
+
+Example:
+
+ROW_NUMBER() OVER (
+    PARTITION BY employee_id
+    ORDER BY effective_date DESC, salary_history_id DESC
+)
+
+Always include a deterministic ORDER BY by adding
+a unique column after the date.
+
+Never order only by a date column because duplicate
+timestamps may exist.
+
+After creating the CTE, always filter:
+
+WHERE row_num = 1
+
+Never use correlated MAX() subqueries unless absolutely necessary.
+
 =========================================================
 AGGREGATION RULES
 =========================================================
