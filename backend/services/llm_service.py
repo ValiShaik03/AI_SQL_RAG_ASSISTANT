@@ -25,30 +25,26 @@ def generate_sql(prompt):
         temperature=0
     )
 
-    sql = response.choices[0].message.content.strip()
+    text = response.choices[0].message.content.strip()
 
-    # Remove markdown if present
-    sql = sql.replace("```sql", "")
-    sql = sql.replace("```", "").strip()
+    # Remove markdown
+    text = text.replace("```sql", "")
+    text = text.replace("```", "").strip()
 
     # -----------------------------
-    # Extract ONLY SQL
+    # Extract ONLY first SQL query
     # -----------------------------
     match = re.search(
-    r"(SELECT\b[\s\S]*|WITH\b[\s\S]*)",
-    sql,
-    re.IGNORECASE)
-    if match:
-        sql = match.group(1).strip()
-        
-    if not sql.endswith(";"):
-        sql += ";"
+        r"(?is)\b(SELECT|WITH)\b[\s\S]*?;",
+        text
+    )
 
-    if match:
-        sql = match.group(1).strip()
+    if not match:
+        raise ValueError("LLM did not generate a valid SQL query.")
+
+    sql = match.group(0).strip()
 
     return sql
-
 
 def generate_answer(question, sql, data, prompt):
 

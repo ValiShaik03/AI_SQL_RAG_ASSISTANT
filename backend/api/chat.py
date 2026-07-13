@@ -1,5 +1,5 @@
 import time
-
+import traceback
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -117,8 +117,11 @@ def chat(request: ChatRequest):
 
     except Exception as e:
 
-        return {
-            "status": "error",
-            "question": request.question,
-            "error": str(e)
-        }
+    traceback.print_exc()
+
+    return {
+        "status": "error",
+        "question": request.question,
+        "generated_sql": generated_sql if "generated_sql" in locals() else "",
+        "error": str(e)
+    }
