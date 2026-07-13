@@ -1,163 +1,262 @@
 def build_sql_prompt(schema: str, question: str) -> str:
     return f"""
-You are an expert MySQL 8.0 Database Engineer specializing in enterprise HR databases.
+You are an expert MySQL Database Engineer.
 
-Your task is to convert the user's natural language question into ONE executable MySQL query.
+Your job is to convert a natural language question into a SINGLE valid MySQL SELECT query.
 
 ========================
 DATABASE SCHEMA
 ========================
+
 {schema}
 
 ========================
-USER QUESTION
+CRITICAL RULES
 ========================
-{question}
 
-========================
-GENERAL RULES
-========================
-- Return ONLY SQL.
-- No explanations.
-- No markdown.
-- No comments.
-- No code fences.
-- Return exactly one SQL statement.
-- Generate valid MySQL 8.0 syntax.
-
-========================
-ALLOWED
-========================
-SELECT, WITH (CTE), JOIN, LEFT JOIN, INNER JOIN,
-GROUP BY, HAVING, ORDER BY, LIMIT,
-CASE, IFNULL, COALESCE,
-COUNT, SUM, AVG, MIN, MAX, ROUND,
-GROUP_CONCAT,
-ROW_NUMBER, DENSE_RANK,
-Window Functions.
-
-========================
-FORBIDDEN
-========================
-Never generate:
-INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE,
-CREATE, REPLACE, RENAME, MERGE,
-CALL, EXEC, EXECUTE,
-COMMIT, ROLLBACK,
-GRANT, REVOKE.
-
-If destructive SQL is requested return:
-NOT_ALLOWED
+1. Generate ONLY SQL.
+2. Do NOT explain anything.
+3. Do NOT use markdown.
+4. Do NOT use ```sql.
+5. Do NOT return comments.
+6. Return exactly ONE query.
+7. Never generate INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, REPLACE, GRANT, REVOKE, EXECUTE or CALL.
+8. Read the schema carefully before generating SQL.
+9. Never invent table names.
+10. Never invent column names.
+11. Never invent relationships.
+12. Use only tables and columns present in the schema.
+13. If information is unavailable in the schema, return the closest valid SQL using available tables.
 
 ========================
 JOIN RULES
 ========================
-Use only relationships present in the schema.
-Never invent foreign keys.
-Join using matching business keys and datatypes.
 
-========================
-CTE RULES
-========================
-Aggregate one-to-many tables inside separate CTEs before joining.
+Always use explicit JOIN syntax.
+
+Never guess foreign keys.
+
+Use only relationships that exist in the schema.
+
+IMPORTANT:
+
+employees.department stores the DEPARTMENT NAME.
+
+departments.department_name stores the department name.
+
+departments.department_id is only the numeric primary key.
+
+Always join them as:
+
+LEFT JOIN departments d
+ON e.department = d.department_name
+
+NEVER generate:
+
+ON e.department = d.department_id
 
 ========================
 LATEST RECORD RULE
 ========================
-Use ROW_NUMBER() for latest records.
+
+Whenever latest salary, latest project, latest leave or latest record is requested:
+
+Use ROW_NUMBER().
+
+Always use deterministic ordering.
 
 Example:
-ROW_NUMBER() OVER(
+
+ROW_NUMBER() OVER (
 PARTITION BY employee_id
-ORDER BY effective_date DESC, employee_id DESC
+ORDER BY effective_date DESC, salary_history_id DESC
 )
 
-Filter row_num = 1.
+Never order only by a date column.
 
 ========================
-ONE ROW PER EMPLOYEE
+AGGREGATION RULES
 ========================
-Unless explicitly requested otherwise,
-return exactly one row per employee.
 
-Aggregate attendance, salary_history,
-training_records, assets,
-employee_projects and leave_requests
-before joining employees.
+Never calculate aggregates after joining one-to-many tables.
 
-========================
-ATTENDANCE RULE
-========================
+Always aggregate first.
+
+Example:
+
+Attendance
+
+LEFT JOIN (
+
+SELECT
+employee_id,
 ROUND(
 SUM(status='Present')*100.0/COUNT(*),
 2
-)
+) AS attendance_percentage
 
-inside its own CTE.
+FROM attendance
 
-========================
-GROUP_CONCAT RULE
-========================
-Always use:
+GROUP BY employee_id
+
+) att
+
+ON e.employee_id = att.employee_id
+
+Assets
+
+LEFT JOIN (
+
+SELECT
+employee_id,
+GROUP_CONCAT(
+DISTINCT asset_name
+ORDER BY asset_name
+SEPARATOR ', '
+) AS assigned_assets
+
+FROM assets
+
+GROUP BY employee_id
+
+) ast
+
+ON e.employee_id = ast.employee_id
+
+Training
+
+LEFT JOIN (
+
+SELECT
+employee_id,
+GROUP_CONCAT(
+DISTINCT course_name
+ORDER BY course_name
+SEPARATOR ', '
+) AS completed_training_courses
+
+FROM training_records
+
+GROUP BY employee_id
+
+) tr
+
+ON e.employee_id = tr.employee_id
+
+Projects
+
+LEFT JOIN (
+
+SELECT
+ep.employee_id,
 
 GROUP_CONCAT(
-DISTINCT column
-ORDER BY column
+DISTINCT p.project_name
+ORDER BY p.project_name
 SEPARATOR ', '
-)
+) AS current_projects,
+
+COUNT(DISTINCT ep.project_id) AS project_count
+
+FROM employee_projects ep
+
+JOIN projects p
+ON ep.project_id=p.project_id
+
+GROUP BY ep.employee_id
+
+) proj
+
+ON e.employee_id=proj.employee_id
+
+Approved Leave
+
+LEFT JOIN (
+
+SELECT
+employee_id,
+
+GROUP_CONCAT(
+DISTINCT leave_type
+ORDER BY leave_type
+SEPARATOR ', '
+) AS approved_leave_status
+
+FROM leave_requests
+
+WHERE status='Approved'
+
+GROUP BY employee_id
+
+) lr
+
+ON e.employee_id=lr.employee_id
 
 ========================
-NULL RULE
+GROUP BY RULE
 ========================
-Use COALESCE() for nullable values.
+
+Whenever aggregate functions are used,
+
+GROUP BY every non-aggregated column.
 
 ========================
-LEFT JOIN RULE
+NULL HANDLING
 ========================
-Use LEFT JOIN for optional data.
+
+Always use COALESCE.
+
+Examples
+
+COALESCE(latest_salary,0)
+
+COALESCE(assigned_assets,'No Assets')
+
+COALESCE(completed_training_courses,'No Training')
+
+COALESCE(current_projects,'No Projects')
+
+COALESCE(project_count,0)
+
+COALESCE(approved_leave_status,'No Leave')
+
+COALESCE(attendance_percentage,0)
 
 ========================
-ALIAS RULE
+SQL STYLE
 ========================
-employees e
-departments d
-projects p
-employee_projects ep
-salary_history sh
-attendance att
-assets ast
-training_records tr
-leave_requests lr
-
-Never use SQL reserved words as aliases.
-
-========================
-PERFORMANCE
-========================
-Avoid:
-SELECT *
-Correlated subqueries
-Cartesian products
-Repeated aggregation
 
 Prefer:
-CTEs
-Window functions
-Pre-aggregated datasets
+
+LEFT JOIN
+
+COALESCE
+
+GROUP_CONCAT(DISTINCT ...)
+
+COUNT(DISTINCT ...)
+
+ROUND()
+
+ROW_NUMBER()
+
+Window Functions
+
+Readable aliases
 
 ========================
-OUTPUT
+OUTPUT FORMAT
 ========================
-Return SQL only.
+
+Return ONLY SQL.
+
 Nothing else.
 
-Verify:
-- Valid MySQL 8 syntax
-- One SQL statement
-- Correct joins
-- No duplicate employees
-- Aggregations before joins
-- ROW_NUMBER for latest records
-- DISTINCT in GROUP_CONCAT
-- COALESCE where needed
+========================
+USER QUESTION
+========================
+
+{question}
+
+SQL:
 """
