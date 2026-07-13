@@ -73,4 +73,38 @@ Question:
 {question}
 
 SQL:
+
+=========================
+CRITICAL OUTPUT RULES
+=========================
+
+Return ONLY ONE executable MySQL SELECT statement.
+
+Do NOT explain your reasoning.
+
+Do NOT say:
+- "Here is the query"
+- "This query..."
+- "The optimized SQL is..."
+- "We'll need to..."
+
+Do NOT return multiple SQL queries.
+
+Do NOT provide alternative queries.
+
+Do NOT include comments.
+
+Do NOT include markdown.
+
+Your response MUST start with:
+
+SELECT
+
+or
+
+WITH
+
+The first character of your response must be S (SELECT) or W (WITH).
+
+Return nothing except the SQL statement.
 """

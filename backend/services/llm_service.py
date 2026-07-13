@@ -1,4 +1,5 @@
 import os
+import re
 from groq import Groq
 from dotenv import load_dotenv
 
@@ -26,9 +27,25 @@ def generate_sql(prompt):
 
     sql = response.choices[0].message.content.strip()
 
+    # Remove markdown if present
     sql = sql.replace("```sql", "")
-    sql = sql.replace("```", "")
-    sql = sql.strip()
+    sql = sql.replace("```", "").strip()
+
+    # -----------------------------
+    # Extract ONLY SQL
+    # -----------------------------
+    match = re.search(
+    r"(SELECT\b[\s\S]*|WITH\b[\s\S]*)",
+    sql,
+    re.IGNORECASE)
+    if match:
+        sql = match.group(1).strip()
+        
+    if not sql.endswith(";"):
+        sql += ";"
+
+    if match:
+        sql = match.group(1).strip()
 
     return sql
 
