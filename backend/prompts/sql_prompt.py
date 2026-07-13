@@ -277,4 +277,25 @@ OUTPUT
 Return ONLY executable SQL.
 
 Nothing else.
+
+=========================
+PERFORMANCE RULES
+=========================
+
+When joining attendance, salary_history, assets, training_records,
+employee_projects, or leave_requests:
+
+Never aggregate after joining raw tables.
+
+Instead:
+
+• Aggregate each one-to-many table first.
+• Use CTEs (WITH) or derived tables.
+• Join aggregated results to employees.
+
+This guarantees one row per employee and avoids duplicate records.
+
+Avoid correlated subqueries whenever a CTE or derived table can be used.
+
+Prefer window functions such as ROW_NUMBER() for latest records.
 """
