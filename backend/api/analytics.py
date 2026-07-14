@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-
+from fastapi import Depends
+from utils.roles import require_admin
 from services.analytics_service import (
     get_dashboard_metrics,
     employees_by_department,
@@ -15,13 +16,15 @@ router = APIRouter(
 
 
 @router.get("/dashboard")
-def dashboard():
+def dashboard(
+    current_user=Depends(require_admin)
+    ):
 
     return get_dashboard_metrics()
 
 
 @router.get("/departments")
-def departments():
+def departments(current_user=Depends(require_admin)):
 
     return {
         "departments": employees_by_department()
@@ -29,7 +32,7 @@ def departments():
 
 
 @router.get("/salary")
-def salary():
+def salary(current_user=Depends(require_admin)):
 
     return {
         "salary": salary_distribution()
@@ -37,13 +40,13 @@ def salary():
 
 
 @router.get("/hiring")
-def hiring():
+def hiring(current_user=Depends(require_admin)):
 
     return {
         "hiring": hiring_trend()
     }
     
 @router.get("/insights")
-def insights():
+def insights(current_user=Depends(require_admin)):
 
     return get_dashboard_insights()

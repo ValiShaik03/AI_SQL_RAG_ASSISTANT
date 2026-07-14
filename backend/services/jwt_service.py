@@ -10,12 +10,6 @@ from jose import JWTError, jwt
 
 load_dotenv()
 
-import os
-
-print("=" * 50)
-print("JWT_SECRET_KEY:", repr(os.getenv("JWT_SECRET_KEY")))
-print("JWT_ALGORITHM:", repr(os.getenv("JWT_ALGORITHM")))
-print("=" * 50)
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 

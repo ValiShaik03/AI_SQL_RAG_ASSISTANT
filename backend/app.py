@@ -7,6 +7,8 @@ from api.chat import router as chat_router
 from api.database import router as database_router
 from api.analytics import router as analytics_router
 from api.auth import router as auth_router
+from fastapi import Depends
+from utils.roles import require_role
 
 app = FastAPI(
     title="AI SQL RAG Assistant",
@@ -87,7 +89,7 @@ def health():
 # -----------------------------------------
 
 @app.get("/employees")
-def employees():
+def employees(current_user=Depends(require_role(["Admin","User"]))):
 
     conn = get_connection()
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
-
+from fastapi import APIRouter, HTTPException, Query, Depends
+from utils.roles import require_admin
 from services.database_service import (
     get_tables,
     get_schema,
@@ -17,13 +18,13 @@ router = APIRouter(
 
 
 @router.get("/stats")
-def database_stats():
+def database_stats(current_user=Depends(require_admin)):
 
     return get_database_stats()
 
 
 @router.get("/tables")
-def tables():
+def tables(current_user=Depends(require_admin)):
 
     return {
 
@@ -33,7 +34,8 @@ def tables():
 
 
 @router.get("/info/{table_name}")
-def table_info(table_name: str):
+def table_info(table_name: str,
+current_user=Depends(require_admin)):
 
     try:
 
@@ -48,7 +50,8 @@ def table_info(table_name: str):
 
 
 @router.get("/schema/{table_name}")
-def schema(table_name: str):
+def schema(table_name: str,
+current_user=Depends(require_admin)):
 
     try:
 
@@ -67,7 +70,8 @@ def schema(table_name: str):
 
 
 @router.get("/schema-summary/{table_name}")
-def schema_summary(table_name: str):
+def schema_summary(table_name: str,
+current_user=Depends(require_admin)):
 
     try:
 
@@ -95,7 +99,9 @@ def preview(
         10,
         ge=1,
         le=100
-    )
+    ),
+
+    current_user=Depends(require_admin)
 
 ):
 
@@ -120,7 +126,7 @@ def preview(
 
 
 @router.get("/relationships")
-def relationships():
+def relationships(current_user=Depends(require_admin)):
 
     return {
 
