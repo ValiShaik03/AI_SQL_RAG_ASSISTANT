@@ -10,6 +10,13 @@ from jose import JWTError, jwt
 
 load_dotenv()
 
+import os
+
+print("=" * 50)
+print("JWT_SECRET_KEY:", repr(os.getenv("JWT_SECRET_KEY")))
+print("JWT_ALGORITHM:", repr(os.getenv("JWT_ALGORITHM")))
+print("=" * 50)
+
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
@@ -24,9 +31,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
 
 def create_access_token(data: dict):
 
-    """
-    Generate JWT Access Token
-    """
+    print("Creating JWT...")
+    print("SECRET_KEY:", repr(SECRET_KEY), type(SECRET_KEY))
+    print("ALGORITHM:", repr(ALGORITHM), type(ALGORITHM))
+    print("Payload:", data)
 
     to_encode = data.copy()
 
@@ -34,19 +42,22 @@ def create_access_token(data: dict):
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
 
-    to_encode.update(
-        {
-            "exp": expire
-        }
-    )
+    to_encode["exp"] = expire
 
-    encoded_jwt = jwt.encode(
-        to_encode,
-        SECRET_KEY,
-        algorithm=ALGORITHM
-    )
+    try:
+        token = jwt.encode(
+            to_encode,
+            SECRET_KEY,
+            algorithm=ALGORITHM
+        )
 
-    return encoded_jwt
+        print("JWT created successfully")
+        return token
+
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        raise
 
 
 # ---------------------------------------------------
