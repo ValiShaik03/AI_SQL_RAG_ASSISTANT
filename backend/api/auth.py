@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+import traceback
 
 from services.auth_service import authenticate_user
 
@@ -17,18 +18,29 @@ class LoginRequest(BaseModel):
 @router.post("/login")
 def login(request: LoginRequest):
 
-    result = authenticate_user(
-        request.email,
-        request.password
-    )
+    try:
 
-    if result is None:
+        result = authenticate_user(
+            request.email,
+            request.password
+        )
+
+        if result is None:
+            return {
+                "status": "failed",
+                "message": "Invalid email or password."
+            }
+
         return {
-            "status": "failed",
-            "message": "Invalid email or password."
+            "status": "success",
+            **result
         }
 
-    return {
-        "status": "success",
-        **result
-    }
+    except Exception as e:
+
+        traceback.print_exc()
+
+        return {
+            "status": "error",
+            "message": str(e)
+        }
