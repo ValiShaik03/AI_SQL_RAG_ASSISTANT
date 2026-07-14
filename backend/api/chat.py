@@ -6,7 +6,8 @@ from pydantic import BaseModel
 from prompts.sql_prompt import build_sql_prompt
 from services.schema_service import get_database_schema
 from prompts.answer_prompt import ANSWER_PROMPT
-
+from fastapi import Depends
+from utils.auth import get_current_user
 from services.llm_service import (
     generate_sql,
     generate_answer
@@ -29,7 +30,10 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/chat")
-def chat(request: ChatRequest):
+def chat(
+    request: ChatRequest,
+    current_user=Depends(get_current_user)
+):
 
     try:
 
@@ -59,13 +63,14 @@ def chat(request: ChatRequest):
         )
 
         generated_sql = generate_sql(prompt)
-
+        print("\n========== CHAT.PY SQL ==========")
+        print(repr(generated_sql))
         # ---------------------------------
         # Validate SQL
         # ---------------------------------
 
         is_valid_sql, message = validate_sql(generated_sql)
-
+        print("SQL Validation:", is_valid_sql, message)
         if not is_valid_sql:
             return {
                 "status": "failed",
