@@ -6,6 +6,7 @@ from services.sql_service import get_connection
 from api.chat import router as chat_router
 from api.database import router as database_router
 from api.analytics import router as analytics_router
+from api.auth import router as auth_router
 
 app = FastAPI(
     title="AI SQL RAG Assistant",
@@ -31,6 +32,7 @@ app.add_middleware(
 app.include_router(chat_router)
 app.include_router(database_router)
 app.include_router(analytics_router)
+app.include_router(auth_router)
 
 # -----------------------------------------
 # Home

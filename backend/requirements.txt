@@ -6,4 +6,5 @@ pymysql==1.2.0
 python-dotenv==1.2.2
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt==4.0.1
 python-multipart
