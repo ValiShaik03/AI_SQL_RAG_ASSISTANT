@@ -9,6 +9,7 @@ from api.analytics import router as analytics_router
 from api.auth import router as auth_router
 from fastapi import Depends
 from utils.roles import require_role
+from api.admin import router as admin_router
 
 app = FastAPI(
     title="AI SQL RAG Assistant",
@@ -35,6 +36,7 @@ app.include_router(chat_router)
 app.include_router(database_router)
 app.include_router(analytics_router)
 app.include_router(auth_router)
+app.include_router(admin_router)
 
 # -----------------------------------------
 # Home
