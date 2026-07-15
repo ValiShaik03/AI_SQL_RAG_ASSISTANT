@@ -364,3 +364,75 @@ def update_user_status(
 
         cursor.close()
         conn.close()
+
+from utils.password import hash_password
+
+def reset_password(
+    user_id: int,
+    new_password: str,
+    current_user_id: int
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        # -----------------------
+        # Check User Exists
+        # -----------------------
+
+        cursor.execute(
+            """
+            SELECT user_id
+            FROM users
+            WHERE user_id=%s
+            """,
+            (user_id,)
+        )
+
+        user = cursor.fetchone()
+
+        if not user:
+
+            return {
+                "status": "failed",
+                "message": "User not found."
+            }
+
+        # -----------------------
+        # Prevent resetting own password
+        # -----------------------
+
+        if user_id == current_user_id:
+
+            return {
+                "status": "failed",
+                "message": "Use the Change Password feature for your own account."
+            }
+
+        password_hash = hash_password(new_password)
+
+        cursor.execute(
+            """
+            UPDATE users
+            SET password_hash=%s
+            WHERE user_id=%s
+            """,
+            (
+                password_hash,
+                user_id
+            )
+        )
+
+        conn.commit()
+
+        return {
+            "status": "success",
+            "message": "Password reset successfully."
+        }
+
+    finally:
+
+        cursor.close()
+        conn.close()

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from services.user_service import update_user
 from utils.roles import require_admin
 from services.user_service import update_user_status
+from services.user_service import reset_password
 from services.user_service import (
     get_all_users,
     create_user
@@ -33,6 +34,9 @@ class UpdateUserRequest(BaseModel):
 
 class UpdateStatusRequest(BaseModel):
     is_active: bool
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
 
 @router.get("/users")
 def users(
@@ -94,4 +98,17 @@ def change_user_status(
         user_id=user_id,
         is_active=request.is_active,
         current_user_id=current_user["user_id"]
+    )
+
+@router.post("/users/{user_id}/reset-password")
+def admin_reset_password(
+    user_id: int,
+    request: ResetPasswordRequest,
+    current_user=Depends(require_admin)
+):
+
+    return reset_password(
+        user_id,
+        request.new_password,
+        current_user["user_id"]
     )
