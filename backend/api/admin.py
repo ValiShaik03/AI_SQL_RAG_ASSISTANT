@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from services.user_service import update_user
 from utils.roles import require_admin
+from services.user_service import update_user_status
 from services.user_service import (
     get_all_users,
     create_user
@@ -29,6 +30,9 @@ class UpdateUserRequest(BaseModel):
     full_name: str
     email: str
     role: str
+
+class UpdateStatusRequest(BaseModel):
+    is_active: bool
 
 @router.get("/users")
 def users(
@@ -77,4 +81,17 @@ def remove_user(
     return delete_user(
         user_id,
         current_user["user_id"]
+    )
+
+@router.patch("/users/{user_id}/status")
+def change_user_status(
+    user_id: int,
+    request: UpdateStatusRequest,
+    current_user=Depends(require_admin)
+):
+
+    return update_user_status(
+        user_id=user_id,
+        is_active=request.is_active,
+        current_user_id=current_user["user_id"]
     )

@@ -290,3 +290,77 @@ def delete_user(
 
         cursor.close()
         conn.close()
+
+def update_user_status(
+    user_id: int,
+    is_active: bool,
+    current_user_id: int
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        # -----------------------------
+        # Check user exists
+        # -----------------------------
+
+        cursor.execute(
+            """
+            SELECT user_id
+            FROM users
+            WHERE user_id=%s
+            """,
+            (user_id,)
+        )
+
+        user = cursor.fetchone()
+
+        if not user:
+            return {
+                "status": "failed",
+                "message": "User not found."
+            }
+
+        # -----------------------------
+        # Prevent self deactivation
+        # -----------------------------
+
+        if user_id == current_user_id and not is_active:
+            return {
+                "status": "failed",
+                "message": "You cannot deactivate your own account."
+            }
+
+        # -----------------------------
+        # Update Status
+        # -----------------------------
+
+        cursor.execute(
+            """
+            UPDATE users
+            SET is_active=%s
+            WHERE user_id=%s
+            """,
+            (
+                is_active,
+                user_id
+            )
+        )
+
+        conn.commit()
+
+        return {
+            "status": "success",
+            "message": (
+                "User activated successfully."
+                if is_active
+                else "User deactivated successfully."
+            )
+        }
+
+    finally:
+
+        cursor.close()
+        conn.close()
