@@ -1,7 +1,7 @@
 from services.db_service import get_connection
 from utils.password import verify_password
 from services.jwt_service import create_access_token
-
+from services.audit_service import log_activity
 
 def authenticate_user(email: str, password: str):
     """
@@ -48,6 +48,12 @@ def authenticate_user(email: str, password: str):
             "role": user["role"]
         }
     )
+    
+    log_activity(
+    user_id=user["user_id"],
+    action="LOGIN",
+    description=f"{user['full_name']} logged into the system."
+)
 
     return {
         "access_token": token,

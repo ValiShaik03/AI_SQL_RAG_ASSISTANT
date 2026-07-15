@@ -56,11 +56,12 @@ def add_user(
 ):
 
     return create_user(
-        request.full_name,
-        request.email,
-        request.password,
-        request.role
-    )
+    request.full_name,
+    request.email,
+    request.password,
+    request.role,
+    current_user["user_id"]
+)
 
 @router.put("/users/{user_id}")
 def edit_user(
@@ -73,7 +74,8 @@ def edit_user(
         user_id,
         request.full_name,
         request.email,
-        request.role
+        request.role,
+        current_user["user_id"]
     )
 
 @router.delete("/users/{user_id}")

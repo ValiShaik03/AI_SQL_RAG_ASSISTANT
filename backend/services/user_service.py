@@ -1,5 +1,6 @@
 from services.db_service import get_connection
 from utils.password import hash_password
+from services.audit_service import log_activity
 
 # ----------------------------------------
 # Allowed Roles
@@ -47,10 +48,11 @@ def get_all_users():
 # ----------------------------------------
 
 def create_user(
-    full_name: str,
-    email: str,
-    password: str,
-    role: str
+    full_name,
+    email,
+    password,
+    role,
+    current_user_id
 ):
 
     # -----------------------------
@@ -128,6 +130,12 @@ def create_user(
 
         conn.commit()
 
+        log_activity(
+            user_id=current_user_id,
+            action="CREATE_USER",
+            description=f"Created user '{full_name}' ({email}) with role '{role}'."
+        )
+
         return {
             "status": "success",
             "message": "User created successfully."
@@ -142,7 +150,8 @@ def update_user(
     user_id: int,
     full_name: str,
     email: str,
-    role: str
+    role: str,
+    current_user_id : int
 ):
 
     if role not in ALLOWED_ROLES:
@@ -215,6 +224,12 @@ def update_user(
 
         conn.commit()
 
+        log_activity(
+            user_id=current_user_id,
+            action="UPDATE_USER",
+            description=f"Updated user '{full_name}' ({email}) with role '{role}'."
+        )
+
         return {
             "status": "success",
             "message": "User updated successfully."
@@ -280,6 +295,12 @@ def delete_user(
         )
 
         conn.commit()
+
+        log_activity(
+            user_id=current_user_id,
+            action="DELETE_USER",
+            description=f"Deleted user with ID {user_id}."
+        )
 
         return {
             "status": "success",
@@ -351,6 +372,16 @@ def update_user_status(
 
         conn.commit()
 
+        log_activity(
+            user_id=current_user_id,
+            action="UPDATE_USER_STATUS",
+            description=(
+                f"Activated user with ID {user_id}."
+                if is_active
+                else f"Deactivated user with ID {user_id}."
+            )
+        )
+
         return {
             "status": "success",
             "message": (
@@ -364,8 +395,6 @@ def update_user_status(
 
         cursor.close()
         conn.close()
-
-from utils.password import hash_password
 
 def reset_password(
     user_id: int,
@@ -426,6 +455,12 @@ def reset_password(
         )
 
         conn.commit()
+
+        log_activity(
+            user_id=current_user_id,
+            action="RESET_PASSWORD",
+            description=f"Reset password for user ID {user_id}."
+        )
 
         return {
             "status": "success",
