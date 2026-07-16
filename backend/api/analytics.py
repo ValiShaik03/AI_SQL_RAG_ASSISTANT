@@ -6,7 +6,8 @@ from services.analytics_service import (
     employees_by_department,
     salary_distribution,
     hiring_trend,
-    get_dashboard_insights
+    get_dashboard_insights,
+    get_system_summary
 )
 
 router = APIRouter(
@@ -18,10 +19,14 @@ router = APIRouter(
 @router.get("/dashboard")
 def dashboard(
     current_user=Depends(require_admin)
-    ):
+):
 
-    return get_dashboard_metrics()
-
+    return {
+        "status": "success",
+        "metrics": get_dashboard_metrics(),
+        "insights": get_dashboard_insights(),
+        "system": get_system_summary()
+    }
 
 @router.get("/departments")
 def departments(current_user=Depends(require_admin)):

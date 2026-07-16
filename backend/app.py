@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from services.sql_service import get_connection
 from api.audit import router as audit_router
 from api.chat import router as chat_router
@@ -10,7 +9,8 @@ from api.auth import router as auth_router
 from fastapi import Depends
 from utils.roles import require_role
 from api.admin import router as admin_router
-
+from api.history import router as history_router
+from api.export import router as export_router
 app = FastAPI(
     title="AI SQL RAG Assistant",
     version="1.0.0"
@@ -38,6 +38,8 @@ app.include_router(analytics_router)
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(audit_router)
+app.include_router(history_router)
+app.include_router(export_router)
 
 # -----------------------------------------
 # Home

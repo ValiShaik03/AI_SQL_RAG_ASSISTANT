@@ -199,3 +199,44 @@ def get_dashboard_insights():
             total
 
     }
+
+def get_system_summary():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("SELECT COUNT(*) AS total FROM users")
+        total_users = cursor.fetchone()["total"]
+
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM users
+            WHERE is_active = TRUE
+        """)
+        active_users = cursor.fetchone()["total"]
+
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM users
+            WHERE is_active = FALSE
+        """)
+        inactive_users = cursor.fetchone()["total"]
+
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM audit_logs
+        """)
+        total_audit_logs = cursor.fetchone()["total"]
+
+        return {
+            "total_users": total_users,
+            "active_users": active_users,
+            "inactive_users": inactive_users,
+            "total_audit_logs": total_audit_logs
+        }
+
+    finally:
+        cursor.close()
+        conn.close()
