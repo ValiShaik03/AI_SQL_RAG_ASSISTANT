@@ -3,20 +3,27 @@ from fastapi import APIRouter, Depends
 from utils.auth import get_current_user
 from services.history_service import (
     get_user_history,
-    delete_history
+    delete_history,
 )
 
 router = APIRouter(
     prefix="/api/history",
-    tags=["Query History"]
+    tags=["Query History"],
 )
 
 
+# ---------------------------------------------------------
+# Get Logged-in User History
+# Roles:
+# Admin
+# Manager
+# Analyst
+# Viewer
+# ---------------------------------------------------------
 @router.get("")
 def history(
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
 ):
-
     history = get_user_history(
         current_user["user_id"]
     )
@@ -24,17 +31,24 @@ def history(
     return {
         "status": "success",
         "count": len(history),
-        "history": history
+        "history": history,
     }
 
 
+# ---------------------------------------------------------
+# Delete Logged-in User History
+# Roles:
+# Admin
+# Manager
+# Analyst
+# Viewer
+# ---------------------------------------------------------
 @router.delete("/{history_id}")
 def delete(
     history_id: int,
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
 ):
-
     return delete_history(
         history_id,
-        current_user["user_id"]
+        current_user["user_id"],
     )

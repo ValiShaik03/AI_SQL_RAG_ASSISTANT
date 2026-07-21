@@ -7,7 +7,7 @@ from prompts.sql_prompt import build_sql_prompt
 from services.schema_service import get_database_schema
 from prompts.answer_prompt import ANSWER_PROMPT
 from fastapi import Depends
-from utils.roles import require_role
+from utils.roles import require_viewer
 from services.history_service import save_query_history
 from services.llm_service import (
     generate_sql,
@@ -33,7 +33,7 @@ class ChatRequest(BaseModel):
 @router.post("/chat")
 def chat(
     request: ChatRequest,
-    current_user=Depends(require_role(["Admin","User"]))
+    current_user=Depends(require_viewer)
 ):
 
     try:
@@ -99,18 +99,6 @@ def chat(
         # ---------------------------------
         # Execution Time
         # ---------------------------------
-
-        execution_time = round(
-            (time.perf_counter() - start_time) * 1000,
-            2
-        )
-
-        answer = generate_answer(
-            request.question,
-            generated_sql,
-            data,
-            ANSWER_PROMPT
-        )
 
         execution_time = round(
             (time.perf_counter() - start_time) * 1000,
