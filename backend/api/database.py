@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-
+from utils.roles import require_viewer
 from utils.roles import require_analyst
 
 from services.database_service import (

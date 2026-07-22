@@ -22,5 +22,7 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token."
         )
-
+    payload = verify_token(token)
+    
+    print("JWT Payload:", payload)
     return payload
