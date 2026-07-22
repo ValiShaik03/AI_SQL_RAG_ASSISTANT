@@ -100,6 +100,15 @@ export interface UsersResponse {
   users: User[];
 }
 
+export interface AuditLog {
+  log_id: number;
+  created_at: string;
+  full_name: string;
+  email: string;
+  action: string;
+  description: string;
+}
+
 const unwrap = <T,>(d:any, keys:string[]):T=>{
  if(Array.isArray(d)) return d as T;
  for(const k of keys) if(d && Array.isArray(d[k])) return d[k] as T;
@@ -127,7 +136,7 @@ export const services = {
   analyticsDepartments:()=>api.get("/analytics/departments").then(r=>unwrap<any[]>(r.data,["departments","data"])),
   analyticsSalary:()=>api.get("/analytics/salary").then(r=>unwrap<any[]>(r.data,["salary","data"])),
   analyticsHiring:()=>api.get("/analytics/hiring").then(r=>unwrap<any[]>(r.data,["hiring","trend","data"])),
-  auditLogs:(page=1,page_size=10,action?:string,user_id?:number)=>api.get("/api/admin/audit-logs",{params:{page,page_size,action,user_id}}).then(r=>r.data),
+  auditLogs: (page = 1,page_size = 10,action?: string,user_id?: number) =>api.get("/api/admin/audit-logs", {params: {page,page_size,action,user_id,},}).then((r) => r.data),
     // -----------------------------
   // User Management
   // -----------------------------

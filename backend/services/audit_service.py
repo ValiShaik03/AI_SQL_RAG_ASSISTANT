@@ -57,27 +57,31 @@ def get_audit_logs(
     try:
 
         query = """
-            SELECT
-                log_id,
-                user_id,
-                action,
-                description,
-                created_at
-            FROM audit_logs
-            WHERE 1=1
-        """
+                SELECT
+                    a.log_id,
+                    a.user_id,
+                    u.full_name,
+                    u.email,
+                    a.action,
+                    a.description,
+                    a.created_at
+                FROM audit_logs a
+                LEFT JOIN users u
+                    ON a.user_id = u.user_id
+                WHERE 1=1
+            """
 
         params = []
 
         if action:
-            query += " AND action=%s"
+            query += " AND a.action=%s"
             params.append(action)
 
         if user_id:
-            query += " AND user_id=%s"
+            query += " AND a.user_id=%s"
             params.append(user_id)
 
-        query += " ORDER BY created_at DESC"
+        query += " ORDER BY a.created_at DESC"
 
         offset = (page - 1) * page_size
 
