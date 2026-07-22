@@ -17,25 +17,50 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle expired/invalid sessions globally.
+// api.interceptors.response.use(
+//   (r) => r,
+//   (error: AxiosError) => {
+//     const status = error.response?.status;
+//     if (status === 401 || status === 403) {
+//       const onLogin =
+//         typeof window !== "undefined" &&
+//         window.location.pathname.startsWith("/login");
+//       if (!onLogin) {
+//         clearAuth();
+//         if (typeof window !== "undefined") {
+//           const msg = encodeURIComponent("Session expired. Please login again.");
+//           window.location.replace(`/login?reason=${msg}`);
+//         }
+//       }
+//     }
+//     return Promise.reject(error);
+//   },
+// );
+
 api.interceptors.response.use(
-  (r) => r,
-  (error: AxiosError) => {
+  (response) => response,
+  (error) => {
+    console.log("========== AXIOS ERROR ==========");
+    console.log("URL:", error.config?.url);
+    console.log("Status:", error.response?.status);
+    console.log("Response:", error.response?.data);
+
     const status = error.response?.status;
-    if (status === 401 || status === 403) {
-      const onLogin =
-        typeof window !== "undefined" &&
-        window.location.pathname.startsWith("/login");
-      if (!onLogin) {
-        clearAuth();
-        if (typeof window !== "undefined") {
-          const msg = encodeURIComponent("Session expired. Please login again.");
-          window.location.replace(`/login?reason=${msg}`);
-        }
-      }
-    }
-    return Promise.reject(error);
-  },
+
+    if (status === 401) {
+    clearAuth();
+
+    const msg = encodeURIComponent(
+        "Session expired. Please login again."
+    );
+
+    window.location.replace(`/login?reason=${msg}`);
+}
+
+return Promise.reject(error);
+  }
 );
+
 
 /**
  * Extract a human-readable error message from an axios/backend error.

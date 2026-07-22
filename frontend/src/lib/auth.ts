@@ -38,7 +38,15 @@ export function setUser(user: AuthUser) {
   notifyAuthChanged();
 }
 
+// export function clearAuth() {
+//   localStorage.removeItem(TOKEN_KEY);
+//   localStorage.removeItem(USER_KEY);
+//   notifyAuthChanged();
+// }
+
 export function clearAuth() {
+  console.trace("clearAuth() called");
+
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   notifyAuthChanged();

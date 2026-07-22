@@ -25,13 +25,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {
-  Search,
-  UserPlus,
-  Pencil,
-  Trash2,
-  KeyRound,
-} from "lucide-react";
+import { Search } from "lucide-react";
+
+import { AddUserDialog } from "@/components/users/AddUserDialog";
+import { EditUserDialog } from "@/components/users/EditUserDialog";
+import { DeleteUserDialog } from "@/components/users/DeleteUserDialog";
+import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
 
 
 export const Route = createFileRoute("/users")({
@@ -168,10 +167,7 @@ function UserManagement() {
 
     </div>
 
-    <Button disabled>
-      <UserPlus className="mr-2 h-4 w-4" />
-      Add User
-    </Button>
+    <AddUserDialog />
 
   </div>
 
@@ -265,29 +261,11 @@ function UserManagement() {
           <TableCell className="text-right">
             <div className="flex items-center justify-end gap-1">
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                <EditUserDialog user={user} />
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <DeleteUserDialog user={user} />
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled
-                >
-                  <KeyRound className="h-4 w-4" />
-                </Button>
+                <ResetPasswordDialog user={user} />
 
               </div>
             </TableCell>

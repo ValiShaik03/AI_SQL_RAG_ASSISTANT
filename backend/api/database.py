@@ -27,7 +27,7 @@ router = APIRouter(
 # ---------------------------------------------------------
 @router.get("/stats")
 def database_stats(
-    current_user=Depends(require_analyst),
+    current_user=Depends(require_viewer),
 ):
     return get_database_stats()
 

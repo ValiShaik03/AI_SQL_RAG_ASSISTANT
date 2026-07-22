@@ -7,7 +7,7 @@ from api.database import router as database_router
 from api.analytics import router as analytics_router
 from api.auth import router as auth_router
 from fastapi import Depends
-from utils.roles import require_role
+from utils.roles import require_analyst
 from api.admin import router as admin_router
 from api.history import router as history_router
 from api.export import router as export_router
@@ -94,7 +94,7 @@ def health():
 # -----------------------------------------
 
 @app.get("/employees")
-def employees(current_user=Depends(require_role(["Admin","User"]))):
+def employees(current_user=Depends(require_analyst)):
 
     conn = get_connection()
 

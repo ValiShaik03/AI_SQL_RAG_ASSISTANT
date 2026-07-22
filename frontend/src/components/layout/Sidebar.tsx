@@ -25,22 +25,39 @@ type Item = {
 const items: Item[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/assistant", label: "AI SQL", icon: Sparkles },
-  { to: "/database", label: "Database", icon: Database },
+
+  {
+    to: "/database",
+    label: "Database",
+    icon: Database,
+    roles: ["admin", "manager", "analyst"],
+  },
+
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/employees", label: "Employees", icon: Users },
+
+  {
+    to: "/employees",
+    label: "Employees",
+    icon: Users,
+    roles: ["admin", "manager", "analyst"],
+  },
+
   { to: "/history", label: "Query History", icon: History },
+
   {
     to: "/users",
     label: "User Management",
     icon: UsersRound,
     roles: ["admin", "administrator"],
   },
+
   {
     to: "/audit",
     label: "Audit Logs",
     icon: ShieldCheck,
     roles: ["admin", "administrator"],
   },
+
   { to: "/docs", label: "API Docs", icon: FileCode2 },
   { to: "/profile", label: "Profile", icon: UserCircle },
   { to: "/settings", label: "Settings", icon: Settings },
@@ -48,7 +65,8 @@ const items: Item[] = [
 
 export function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { hasRole } = useAuth();
+  const { hasRole, role } = useAuth();
+  const isViewer = role?.toLowerCase() === "viewer";
   const visible = items.filter((i) => !i.roles || hasRole(i.roles));
 
   return (

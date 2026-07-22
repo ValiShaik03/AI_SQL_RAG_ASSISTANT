@@ -17,7 +17,7 @@ import { StatCard } from "@/components/ui-kit/StatCard";
 import { Card } from "@/components/ui-kit/Card";
 import { ErrorState } from "@/components/ui-kit/States";
 import { Button } from "@/components/ui-kit/Button";
-
+import { useAuth } from "@/lib/auth-context";
 export const Route = createFileRoute("/")({
   component: DashboardPage,
 });
@@ -40,13 +40,21 @@ function titleCase(s: string) {
 }
 
 function DashboardPage() {
+  const { role } = useAuth();
+
+  const canViewDatabase =
+    role === "Admin" ||
+    role === "Manager" ||
+    role === "Analyst";
   const [healthQ, dashQ, insightsQ, statsQ] = useQueries({
     queries: [
       { queryKey: ["health"], queryFn: services.health, refetchInterval: 30_000, retry: 1 },
       { queryKey: ["dashboard"], queryFn: services.dashboard, retry: 1, staleTime: 60_000 },
       { queryKey: ["insights"], queryFn: services.insights, retry: 1, staleTime: 60_000 },
-      { queryKey: ["dbStats"], queryFn: services.dbStats, retry: 1, staleTime: 60_000 },
+      {queryKey: ["dbStats"],queryFn: services.dbStats,enabled: canViewDatabase,retry: 1,staleTime: 60_000,
+      },
     ],
+  
   });
 
   const health: any = healthQ.data ?? {};
@@ -163,10 +171,10 @@ function DashboardPage() {
               value={fmt(totalDepartments)}
             />
             <StatCard
-              label="Projects"
-              icon={<FolderKanban className="h-4 w-4" />}
-              loading={statsQ.isLoading}
-              value={fmt(projectsCount)}
+              label="Highest Salary"
+              icon={<TrendingUp className="h-4 w-4" />}
+              loading={dashQ.isLoading}
+              value={money(maxSalary)}
             />
             <StatCard
               label="Average Salary"
@@ -174,11 +182,13 @@ function DashboardPage() {
               loading={dashQ.isLoading || insightsQ.isLoading}
               value={money(avgSalary)}
             />
+            {canViewDatabase ? (
+              <>
             <StatCard
-              label="Highest Salary"
-              icon={<TrendingUp className="h-4 w-4" />}
-              loading={dashQ.isLoading}
-              value={money(maxSalary)}
+              label="Projects"
+              icon={<FolderKanban className="h-4 w-4" />}
+              loading={statsQ.isLoading}
+              value={fmt(projectsCount)}
             />
             <StatCard
               label="Database Tables"
@@ -192,67 +202,151 @@ function DashboardPage() {
               loading={statsQ.isLoading}
               value={fmt(totalRows)}
             />
+          </>
+        ):(
+  <>
+    <StatCard
+      label="Role"
+      value="Viewer"
+    />
+
+    <StatCard
+      label="AI Assistant"
+      value="Available"
+    />
+
+    <StatCard
+      label="History"
+      value="Enabled"
+    />
+  </>
+)}
           </div>
 
-          {/* Database overview */}
-          <Card className="flex flex-col gap-5">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-xl gradient-brand grid place-items-center shadow-lg shadow-primary/30">
-                  <ServerCog className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Database Overview</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Live schema snapshot from your backend.
-                  </p>
-                </div>
-              </div>
-              <div className="grid grid-cols-4 gap-2 text-center">
-                <MiniStat label="Database" value={String(dbName).toUpperCase()} />
-                <MiniStat label="Tables" value={fmt(totalTables)} />
-                <MiniStat label="Rows" value={fmt(totalRows)} />
-                <MiniStat label="Columns" value={fmt(totalColumns)} />
-              </div>
+          {/* Database Overview */}
+{canViewDatabase ? (
+  <Card className="flex flex-col gap-5">
+    <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex items-center gap-3">
+        <div className="h-11 w-11 rounded-xl gradient-brand grid place-items-center shadow-lg shadow-primary/30">
+          <ServerCog className="h-5 w-5 text-white" />
+        </div>
+
+        <div>
+          <h3 className="font-semibold">Database Overview</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Live schema snapshot from your backend.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4 gap-2 text-center">
+        <MiniStat label="Database" value={String(dbName).toUpperCase()} />
+        <MiniStat label="Tables" value={fmt(totalTables)} />
+        <MiniStat label="Rows" value={fmt(totalRows)} />
+        <MiniStat label="Columns" value={fmt(totalColumns)} />
+      </div>
+    </div>
+
+    {statsQ.isLoading ? (
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-24 rounded-xl bg-muted/40 animate-pulse"
+          />
+        ))}
+      </div>
+    ) : tables.length === 0 ? (
+      <div className="text-sm text-muted-foreground py-6 text-center">
+        No table statistics available.
+      </div>
+    ) : (
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+        {tables.map((t) => (
+          <div
+            key={t.table}
+            className="rounded-xl border border-border bg-muted/40 p-4 flex flex-col gap-1 hover:border-primary/50 hover:bg-muted/60 hover:-translate-y-0.5 transition-all"
+          >
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Table2 className="h-3.5 w-3.5" />
+              <span className="uppercase tracking-wider text-[10px]">
+                Table
+              </span>
             </div>
 
-            {statsQ.isLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="h-24 rounded-xl bg-muted/40 animate-pulse" />
-                ))}
-              </div>
-            ) : tables.length === 0 ? (
-              <div className="text-sm text-muted-foreground py-6 text-center">
-                No table statistics available.
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-                {tables.map((t) => (
-                  <div
-                    key={t.table}
-                    className="rounded-xl border border-border bg-muted/40 p-4 flex flex-col gap-1 hover:border-primary/50 hover:bg-muted/60 hover:-translate-y-0.5 transition-all"
-                  >
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Table2 className="h-3.5 w-3.5" />
-                      <span className="uppercase tracking-wider text-[10px]">Table</span>
-                    </div>
-                    <div className="font-semibold text-sm truncate" title={t.table}>
-                      {titleCase(t.table)}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1">
-                        <Rows3 className="h-3 w-3" />
-                        {Number(t.rows ?? 0).toLocaleString()} rows
-                      </span>
-                      <span>·</span>
-                      <span>{Number(t.columns ?? 0).toLocaleString()} cols</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
+            <div
+              className="font-semibold text-sm truncate"
+              title={t.table}
+            >
+              {titleCase(t.table)}
+            </div>
+
+            <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
+                <Rows3 className="h-3 w-3" />
+                {Number(t.rows ?? 0).toLocaleString()} rows
+              </span>
+
+              <span>·</span>
+
+              <span>
+                {Number(t.columns ?? 0).toLocaleString()} cols
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </Card>
+) : (
+  <Card className="p-6">
+    <div className="flex flex-col items-center text-center gap-4 py-3">
+      <div className="h-16 w-16 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg">
+        <Database className="h-8 w-8 text-white" />
+      </div>
+
+      <div>
+        <h2 className="text-xl font-bold">
+          Welcome to SQL RAG Assistant
+        </h2>
+
+        <p className="text-muted-foreground mt-2 max-w-2xl">
+          Ask questions using natural language, explore analytics,
+          review previous conversations and generate SQL queries
+          with AI.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mt-4">
+        <Card className="p-4">
+          <div className="text-3xl mb-3">🤖</div>
+          <h3 className="font-semibold">AI SQL</h3>
+          <p className="text-sm text-muted-foreground mt-2">
+            Ask questions in plain English and let AI generate SQL.
+          </p>
+        </Card>
+
+        <Card className="p-6">
+          <div className="text-3xl mb-3">📊</div>
+          <h3 className="font-semibold">Analytics</h3>
+          <p className="text-sm text-muted-foreground mt-2">
+            View reports and business insights instantly.
+          </p>
+        </Card>
+
+        <Card className="p-6">
+          <div className="text-3xl mb-3">🕒</div>
+          <h3 className="font-semibold">Query History</h3>
+          <p className="text-sm text-muted-foreground mt-2">
+            Access all your previous AI conversations.
+          </p>
+        </Card>
+      </div>
+    </div>
+    </Card>
+)}
+
         </>
       )}
     </div>
