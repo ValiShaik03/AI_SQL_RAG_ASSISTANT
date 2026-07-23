@@ -54,17 +54,26 @@ const actionColor = (action: string) => {
 };
 
 function AuditLogs() {
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [search, setSearch] = useState("");
   const audit = useQuery({
-  queryKey: ["audit-logs"],
-  queryFn: () => services.auditLogs(1, 100),
+  
+  queryKey: ["audit-logs",page],
+  queryFn: () => services.auditLogs(page, pageSize),
 });
 
-// ✅ Hooks must come immediately after other hooks
-const [search, setSearch] = useState("");
 
 const rows = Array.isArray(audit.data)
   ? audit.data
   : audit.data?.logs ?? audit.data?.items ?? audit.data?.data ?? [];
+
+
+const totalPages = audit.data?.total_pages ?? 1;
+const totalRecords = audit.data?.total_records ?? 0;
+
+const startRecord = (page - 1) * pageSize + 1;
+const endRecord = Math.min(page * pageSize, totalRecords);
 
 const filteredLogs = useMemo(() => {
   const value = search.toLowerCase();
@@ -77,7 +86,6 @@ const filteredLogs = useMemo(() => {
   );
 }, [rows, search]);
 
-// ✅ Early returns AFTER all hooks
 if (audit.isLoading) {
   return <Loader />;
 }
@@ -128,7 +136,7 @@ if (audit.isError) {
 
       <TableRow>
 
-        <TableHead>Timestamp</TableHead>
+        <TableHead className="w-32">Timestamp</TableHead>
 
         <TableHead>User</TableHead>
 
@@ -146,15 +154,23 @@ if (audit.isError) {
 
     <TableRow key={log.log_id}>
 
-      <TableCell>
-        {new Date(log.created_at).toLocaleString("en-IN", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </TableCell>
+      <TableCell className="w-32">
+  <div className="flex flex-col">
+    <span>
+      {new Date(log.created_at).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+      })}
+    </span>
+
+    <span className="text-xs text-muted-foreground">
+      {new Date(log.created_at).toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </span>
+  </div>
+</TableCell>
 
       <TableCell>
         <div className="flex flex-col">
@@ -184,6 +200,37 @@ if (audit.isError) {
 
 </TableBody>
 </Table>
+<div className="flex items-center justify-between border-t px-6 py-4">
+
+  <p className="text-sm text-muted-foreground">
+    Showing {startRecord}–{endRecord} of {totalRecords} records
+  </p>
+
+  <div className="flex gap-2">
+
+    <button
+      className="rounded border px-3 py-1 text-sm disabled:opacity-50"
+      disabled={page === 1}
+      onClick={() => setPage((p) => p - 1)}
+    >
+      Previous
+    </button>
+
+    <span className="px-3 py-1 text-sm">
+      Page {page} of {totalPages}
+    </span>
+
+    <button
+      className="rounded border px-3 py-1 text-sm disabled:opacity-50"
+      disabled={page === totalPages}
+      onClick={() => setPage((p) => p + 1)}
+    >
+      Next
+    </button>
+
+  </div>
+
+</div>
 </>
         )}
       </Card>
