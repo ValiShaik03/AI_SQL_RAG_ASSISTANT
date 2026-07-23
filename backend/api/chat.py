@@ -9,6 +9,7 @@ from prompts.answer_prompt import ANSWER_PROMPT
 from fastapi import Depends
 from utils.roles import require_viewer
 from services.history_service import save_query_history
+from services.audit_service import log_activity
 from services.llm_service import (
     generate_sql,
     generate_answer
@@ -117,6 +118,19 @@ def chat(
             execution_time_ms=execution_time
         )
 
+        
+        # ---------------------------------
+        # Audit Log
+        # ---------------------------------
+
+        log_activity(
+            user_id=current_user["user_id"],
+            action="QUERY_EXECUTED",
+            description="AI query executed successfully.",
+            query=request.question,
+        )
+ 
+
         # ---------------------------------
         # Response
         # ---------------------------------
@@ -134,6 +148,12 @@ def chat(
     except Exception as e:
 
         traceback.print_exc()
+        log_activity(
+            user_id=current_user["user_id"],
+            action="QUERY_FAILED",
+            description=str(e),
+            query=request.question,
+        )
 
         return {
                 "status": "error",

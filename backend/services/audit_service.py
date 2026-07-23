@@ -4,7 +4,8 @@ from services.db_service import get_connection
 def log_activity(
     user_id: int,
     action: str,
-    description: str
+    description: str,
+    query : str | None = None,
 ):
     """
     Store a user activity in the audit_logs table.
@@ -16,26 +17,29 @@ def log_activity(
     try:
 
         cursor.execute(
-            """
-            INSERT INTO audit_logs
-            (
-                user_id,
-                action,
-                description
-            )
-            VALUES
-            (
-                %s,
-                %s,
-                %s
-            )
-            """,
-            (
-                user_id,
-                action,
-                description
-            )
-        )
+    """
+    INSERT INTO audit_logs
+    (
+        user_id,
+        action,
+        description,
+        query
+    )
+    VALUES
+    (
+        %s,
+        %s,
+        %s,
+        %s
+    )
+    """,
+    (
+        user_id,
+        action,
+        description,
+        query,
+    )
+)
 
         conn.commit()
 
@@ -62,7 +66,9 @@ def get_audit_logs(
                     a.user_id,
                     u.full_name,
                     u.email,
+                    u.role,
                     a.action,
+                    a.query,
                     a.description,
                     a.created_at
                 FROM audit_logs a
@@ -92,6 +98,8 @@ def get_audit_logs(
         cursor.execute(query, tuple(params))
 
         logs = cursor.fetchall()
+        
+        print(logs[0])
 
         return logs
 

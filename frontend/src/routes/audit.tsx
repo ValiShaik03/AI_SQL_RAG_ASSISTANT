@@ -81,7 +81,9 @@ const filteredLogs = useMemo(() => {
   return rows.filter((log: any) =>
     log.full_name?.toLowerCase().includes(value) ||
     log.email?.toLowerCase().includes(value) ||
+    log.role?.toLowerCase().includes(value) ||
     log.action?.toLowerCase().includes(value) ||
+    log.query?.toLowerCase().includes(value) ||
     log.description?.toLowerCase().includes(value)
   );
 }, [rows, search]);
@@ -142,6 +144,8 @@ if (audit.isError) {
 
         <TableHead>Action</TableHead>
 
+        <TableHead>Query</TableHead>
+
         <TableHead>Description</TableHead>
 
       </TableRow>
@@ -154,48 +158,62 @@ if (audit.isError) {
 
     <TableRow key={log.log_id}>
 
-      <TableCell className="w-32">
-  <div className="flex flex-col">
-    <span>
-      {new Date(log.created_at).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-      })}
-    </span>
+  {/* Timestamp */}
+  <TableCell className="w-32">
+    <div className="flex flex-col">
+      <span>
+        {new Date(log.created_at).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+        })}
+      </span>
 
-    <span className="text-xs text-muted-foreground">
-      {new Date(log.created_at).toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })}
-    </span>
-  </div>
-</TableCell>
+      <span className="text-xs text-muted-foreground">
+        {new Date(log.created_at).toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </span>
+    </div>
+  </TableCell>
 
-      <TableCell>
-        <div className="flex flex-col">
-          <span className="font-medium">
-            {log.full_name}
-          </span>
+  {/* User */}
+  <TableCell>
+    <div className="flex flex-col gap-1">
+      <span className="font-medium">{log.full_name}</span>
 
-          <span className="text-xs text-muted-foreground">
-            {log.email}
-          </span>
-        </div>
-      </TableCell>
+      <Badge variant="secondary" className="w-fit text-[10px]">
+        {log.role ?? "—"}
+      </Badge>
 
-      <TableCell>
-        <Badge className={actionColor(log.action)}>
-          {log.action.replaceAll("_", " ")}
-        </Badge>
-      </TableCell>
+      <span className="text-xs text-muted-foreground">
+        {log.email}
+      </span>
+    </div>
+  </TableCell>
 
-      <TableCell className="max-w-lg whitespace-normal">
-        {log.description}
-      </TableCell>
+  {/* Action */}
+  <TableCell>
+    <Badge className={actionColor(log.action)}>
+      {log.action.replaceAll("_", " ")}
+    </Badge>
+  </TableCell>
 
-    </TableRow>
+  {/* Query */}
+  <TableCell className="max-w-sm">
+    {log.query ? (
+      <span className="line-clamp-2">{log.query}</span>
+    ) : (
+      <span className="text-muted-foreground">—</span>
+    )}
+  </TableCell>
 
+  {/* Description */}
+  <TableCell className="max-w-lg whitespace-normal">
+    {log.description}
+  </TableCell>
+
+</TableRow>
   ))}
 
 </TableBody>

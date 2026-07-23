@@ -105,7 +105,9 @@ export interface AuditLog {
   created_at: string;
   full_name: string;
   email: string;
+  role: string;
   action: string;
+  query: string | null;
   description: string;
 }
 
